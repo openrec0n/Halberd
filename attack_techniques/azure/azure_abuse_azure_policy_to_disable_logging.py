@@ -139,7 +139,7 @@ class AzureAbuseAzurePolicyToDisableLogging(BaseTechnique):
 
             print(f"Policy Definition '{policy_definition_result.name}' created.")
 
-            policy_assignment_name = "DisableDiagnosticSettingsPolicyAssignment"
+            policy_assignment_name = f"{policy_definition_name}Assignment"
 
             policy_assignment = policy_client.policy_assignments.create(
                 scope=f"/subscriptions/{subscription_id}/resourceGroups/{resource_group_name}",
