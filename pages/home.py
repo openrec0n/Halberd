@@ -99,7 +99,7 @@ layout = html.Div([
                 f"{len(set(technique['surface'] for techniques in tactics_dict.values() for technique in techniques))} Cloud Platforms"
             ], className="d-flex align-items-center halberd-text"),
                 html.P(
-                    "Comprehensive coverage across AWS, Azure, GCP, Microsoft 365 & Entra ID. Test your entire cloud estate from a single tool.",
+                    "Comprehensive coverage across Entra ID, Microsoft 365, AWS, Azure & GCP. Test your entire cloud estate from a single tool.",
                     className="halberd-text"
                 )
             ],
