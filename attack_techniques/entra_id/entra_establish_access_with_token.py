@@ -20,13 +20,14 @@ class EntraEstablishAccessWithToken(BaseTechnique):
                 sub_technique_name="Application Access Token"
             )
         ]
-        super().__init__("Establish Access With Token", "Adds access token to app to access target environment and use in future actions", mitre_techniques)
+        super().__init__("Establish Access With Token", "Adds access token, and optionally a refresh token, to Halberd to access target Microsoft environment and use in future actions. Adding refresh token automatically refreshes the access token. ", mitre_techniques)
 
     def execute(self, **kwargs: Any) -> Tuple[ExecutionStatus, Dict[str, Any]]:
         self.validate_parameters(kwargs)
         
         try:
             access_token: str = kwargs.get('access_token', None)
+            refresh_token: str = kwargs.get('refresh_token', None)
             set_as_active_token: bool = kwargs.get('set_as_active_token', False)
             
             if access_token in [None, ""]:
@@ -38,9 +39,11 @@ class EntraEstablishAccessWithToken(BaseTechnique):
             if set_as_active_token in [None, ""]:
                 set_as_active_token = False
 
+            entra_token_manager = EntraTokenManager()
+
             try:
                 # Decode token information
-                token_info = EntraTokenManager().decode_jwt_token(access_token)
+                token_info = entra_token_manager.decode_jwt_token(access_token)
             except Exception as e:
                 return ExecutionStatus.FAILURE, {
                     "error": str(e),
@@ -48,11 +51,11 @@ class EntraEstablishAccessWithToken(BaseTechnique):
                 }
             
             # Add token to app
-            EntraTokenManager().add_token(access_token)
+            entra_token_manager.add_token(access_token, refresh_token= refresh_token)
 
             # Set token active if selected
             if set_as_active_token:
-                EntraTokenManager().set_active_token(access_token)
+                entra_token_manager.set_active_token(access_token)
             
             return ExecutionStatus.SUCCESS, {
                 "message": f"Successfully added access to app",
@@ -72,5 +75,6 @@ class EntraEstablishAccessWithToken(BaseTechnique):
     def get_parameters(self) -> Dict[str, Dict[str, Any]]:
         return {
             "access_token": {"type": "str", "required": True, "default":None, "name": "Access Token", "input_field_type" : "text"},
+            "refresh_token": {"type": "str", "required": False, "default":None, "name": "Refresh Token", "input_field_type" : "text"},
             "set_as_active_token": {"type": "bool", "required": False, "default":False, "name": "Set as Active Token?", "input_field_type" : "bool"},
         }
